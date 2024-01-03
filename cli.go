@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"net"
 	"net/http"
@@ -34,7 +33,7 @@ func Token(ctx context.Context, cfg *oauth2.Config, localPort int, redirect stri
 	shutdown := make(chan struct{})
 
 	var code string
-	errC := make(chan error, 1)
+	errC := make(chan error, 2)
 
 	// OAuth2 callback handler on the default mux.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +78,7 @@ func Token(ctx context.Context, cfg *oauth2.Config, localPort int, redirect stri
 		<-shutdown
 
 		if err := server.Shutdown(ctx); err != nil {
-			log.Println("Failed to shutdown server", err)
+			errC <- fmt.Errorf("failed to shutdown server: %w", err)
 		}
 	}()
 

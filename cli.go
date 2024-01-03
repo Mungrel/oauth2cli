@@ -31,9 +31,9 @@ func Token(ctx context.Context, cfg *oauth2.Config, localPort int, redirect stri
 	url := cfg.AuthCodeURL(state)
 
 	shutdown := make(chan struct{})
+	errC := make(chan error, 2)
 
 	var code string
-	errC := make(chan error, 2)
 
 	// OAuth2 callback handler on the default mux.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
